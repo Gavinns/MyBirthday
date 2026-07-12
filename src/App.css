@@ -1,0 +1,411 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Nunito:wght@400;600;700;800&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+.App {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background: #0a0a0c;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+}
+
+/* ===========================
+   🌸 BACKGROUND OVERLAY
+   =========================== */
+
+.background-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+    ellipse at 30% 40%,
+    #2a2a30 0%,
+    #17171a 40%,
+    #060607 100%
+  );
+  transition: opacity 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+}
+
+/* ===========================
+   🎈 FLOATING BUBBLES
+   =========================== */
+
+.bubbles-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.floating-bubble {
+  position: absolute;
+  bottom: -60px;
+  animation: floatUp linear infinite;
+  user-select: none;
+  filter: drop-shadow(0 0 8px rgba(180, 180, 195, 0.4));
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-110vh) rotate(25deg) scale(0.85);
+    opacity: 0;
+  }
+}
+
+/* ===========================
+   💻 TERMINAL WINDOW
+   =========================== */
+
+.terminal-window {
+  position: relative;
+  z-index: 2;
+  width: min(560px, 90vw);
+  background: rgba(14, 14, 16, 0.92);
+  border: 1px solid rgba(190, 190, 200, 0.2);
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 1px rgba(180, 180, 190, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 80px rgba(120, 120, 130, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  animation: terminalAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes terminalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.terminal-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(190, 190, 200, 0.14);
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: block;
+}
+
+.terminal-dot.red {
+  background: #ff5f57;
+  box-shadow: 0 0 6px rgba(255, 95, 87, 0.5);
+}
+.terminal-dot.yellow {
+  background: #febc2e;
+  box-shadow: 0 0 6px rgba(254, 188, 46, 0.5);
+}
+.terminal-dot.green {
+  background: #28c840;
+  box-shadow: 0 0 6px rgba(40, 200, 64, 0.5);
+}
+
+.terminal-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.7rem;
+  font-family: "Space Mono", monospace;
+  color: rgba(190, 190, 200, 0.55);
+  letter-spacing: 0.05em;
+  margin-left: -60px;
+}
+
+.terminal-body {
+  padding: 20px 24px 24px;
+  min-height: 200px;
+}
+
+/* ===========================
+   ⌨️ TYPED TEXT
+   =========================== */
+
+.typed-text {
+  font-family: "Space Mono", "Courier New", Courier, monospace;
+  font-size: clamp(0.75rem, 2vw, 0.88rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.typed-line {
+  display: block;
+  line-height: 1.7;
+  color: rgba(215, 215, 222, 0.88);
+  white-space: pre-wrap;
+  min-height: 1.7em;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.typed-line.visible {
+  opacity: 1;
+}
+
+.typed-line.special-line {
+  color: #e8e8ee;
+  font-size: clamp(0.8rem, 2.2vw, 0.95rem);
+  text-shadow:
+    0 0 12px rgba(200, 200, 215, 0.6),
+    0 0 24px rgba(150, 150, 165, 0.35);
+  letter-spacing: 0.04em;
+}
+
+.typed-cursor {
+  display: inline-block;
+  color: #c8c8d2;
+  margin-left: 1px;
+  animation: cursorGlow 0.9s ease-in-out infinite;
+}
+
+@keyframes cursorGlow {
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 8px rgba(200, 200, 210, 0.8);
+  }
+  50% {
+    opacity: 0.15;
+    text-shadow: none;
+  }
+}
+
+/* ===========================
+   ▶ START PROMPT
+   =========================== */
+
+.start-prompt {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #c8c8d2;
+  font-family: "Space Mono", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  animation: startPromptPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+@keyframes startPromptPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.start-prompt-arrow {
+  animation: arrowBounce 1.2s ease-in-out infinite;
+  display: inline-block;
+  color: #b0b0bc;
+}
+
+@keyframes arrowBounce {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+}
+
+/* ===========================
+   🕯️ HINT OVERLAY
+   =========================== */
+
+.hint-overlay {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 28px;
+  background: rgba(14, 14, 16, 0.8);
+  border: 1px solid rgba(190, 190, 200, 0.25);
+  border-radius: 999px;
+  color: rgba(215, 215, 222, 0.92);
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: none;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(150, 150, 165, 0.12);
+  animation: hintSlideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transition: box-shadow 0.45s ease;
+}
+
+.hint-overlay.pulse {
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(160, 160, 175, 0.35),
+    0 0 0 3px rgba(160, 160, 175, 0.15);
+}
+
+@keyframes hintSlideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.hint-icon {
+  font-size: 1.1rem;
+  animation: hintIconWiggle 2s ease-in-out infinite;
+}
+
+.hint-icon:last-child {
+  animation-delay: 0.3s;
+}
+
+@keyframes hintIconWiggle {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-8deg) scale(1.1);
+  }
+  75% {
+    transform: rotate(8deg) scale(1.1);
+  }
+}
+
+/* ===========================
+   ✨ WISH OVERLAY
+   =========================== */
+
+.wish-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding-top: 28px;
+  pointer-events: none;
+}
+
+.wish-text {
+  font-family: "Nunito", sans-serif;
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  font-weight: 800;
+  color: #f0f0f4;
+  text-shadow:
+    0 0 20px rgba(210, 210, 220, 0.7),
+    0 0 40px rgba(160, 160, 175, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.04em;
+  animation: wishAppear 1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  padding: 14px 32px;
+  background: rgba(14, 14, 16, 0.55);
+  border-radius: 999px;
+  border: 1px solid rgba(190, 190, 200, 0.22);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+@keyframes wishAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.9);
+    letter-spacing: 0.15em;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    letter-spacing: 0.04em;
+  }
+}
+
+/* ===========================
+   📱 RESPONSIVE
+   =========================== */
+
+@media (max-width: 480px) {
+  .terminal-window {
+    width: 92vw;
+    border-radius: 10px;
+  }
+
+  .terminal-body {
+    padding: 14px 16px 18px;
+  }
+
+  .hint-overlay {
+    font-size: 0.75rem;
+    padding: 10px 20px;
+    bottom: 1.2rem;
+  }
+}
